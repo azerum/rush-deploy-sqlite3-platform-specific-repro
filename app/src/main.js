@@ -6,5 +6,12 @@ async function main() {
     // Use functions from the package somehow
 
     const connection = new sqlite3.Database('./db.sqlite3')
-    connection.close()
+
+    connection.close(error => {
+        if (error) {
+            throw error
+        }
+
+        console.log('Yes!')
+    })
 }

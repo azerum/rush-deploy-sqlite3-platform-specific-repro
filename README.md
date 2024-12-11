@@ -1,9 +1,11 @@
-1. rush install
-2. Try `cd app; node src/main.js` - program exits without errors
-3. rush deploy -p @local/app --overwrite
+# Main issue
+
+1. `rush install`
+2. Try `cd app; node src/main.js` - prints `Yes!`
+3. `rush deploy -p @local/app --overwrite`
 4. Change `platform` in `./docker-compose.yml` to platform other than
 of your host
-5. docker compose up - prints message:
+1. `docker compose up --build` - prints message:
 
 ```
 app-1  | node:internal/modules/cjs/loader:1586
@@ -27,3 +29,55 @@ app-1  |
 app-1  | Node.js v20.18.1
 app-1 exited with code 1
 ```
+
+# Overriding works for `rush install`, breaks locally
+
+1. Run in shell:
+
+> Note: change `npm_config_platform` and `npm_config_arch` to something
+> other than your host
+>
+> For list of supported platforms, see file names at https://github.com/TryGhost/node-sqlite3/releases/tag/v5.1.7
+>
+> Format is:
+> 
+> {name}-v{version}-{runtime}-v{abi}-{platform}{libc}-{arch}.tar.gz
+>
+> npm_config_target is {abi}
+
+> Details: npm_config_libc=musl since Dockerfile is alpine-based
+
+```shell
+npm_config_target=6 \
+npm_config_platform=linux \
+npm_config_libc=musl \
+npm_config_arch=x64 \
+rush install --purge
+```
+
+2. Try `cd app; node src/main.js` - get error similar to the one above
+
+3. `rush deploy -p @local/app --overwrite`
+
+4. `docker compose up --build` - prints `Yes!`
+
+# Overriding does not do anything for `rush deploy`
+
+> If you walked through previous section, reinstall sqlite3 for your
+> host using:
+>
+> `rush install --purge`
+
+1. You can again verify that `cd app; node src/main.js` prints `Yes!`
+
+2. Run in shell:
+
+```shell
+npm_config_target=6 \
+npm_config_platform=linux \
+npm_config_libc=musl \
+npm_config_arch=x64 \
+rush deploy -p @local/app --overwrite
+```
+
+3. `docker compose up --build` - get the same error
