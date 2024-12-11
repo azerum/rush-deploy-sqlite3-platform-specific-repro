@@ -1,0 +1,11 @@
+{
+    "type": "module",
+    "name": "@local/app",
+    "version": "1.0.0",
+    "devDependencies": {
+      "@types/node": "20.16.0"
+    },
+    "dependencies": {
+      "sqlite3": "5.1.7"
+    }
+}
